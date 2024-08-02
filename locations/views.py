@@ -91,6 +91,9 @@ This endpoint gives the shortest path between two points on the map in a sequenc
 
 @api_view(("POST",))
 def get_shortest_path(request):
+    new_url = "http://127.0.0.1:5000/api/shortestpath/"
+    params = request.GET.dict()
+    response = requests.get(new_url, params=params)
     try:
         start = request.data["origin"]
         formatted_origin = True
@@ -157,9 +160,9 @@ def get_shortest_path(request):
                 ]
             )
 
-            return Response(loc_path)
-        return Response(data={"detail": "No path found"})
-    return Response()
+        #     return Response(loc_path)
+        # return Response(data={"detail": "No path found"})
+    return Response(response.json())
 
 
 """
@@ -171,7 +174,10 @@ Finding the nearest two points for a given set of coordinates.
 def nearest_points(request):
     xcor = request.data["xcor"]
     ycor = request.data["ycor"]
-
+    new_url = "http://127.0.0.1:5000/api/nearest/"
+    params = request.GET.dict()
+    response = requests.get(new_url, params=params)
+    return Response(response.json())
     locations = {}
     if xcor is not None and ycor is not None:
         try:
@@ -179,7 +185,7 @@ def nearest_points(request):
             ycor = int(ycor)
         except TypeError:
             data = {"detail": "Invalid Coordinates "}
-            return Response(data=data)
+            # return Response(data=data)
         if "only_nodes" in request.data:
             filtered_locations = Location.objects.filter(
                 Q(name__contains="Node"),
@@ -235,10 +241,9 @@ def nearest_points(request):
             locations[0] = LocationSerializer(filtered_locations[npi]).data
             locations[1] = LocationSerializer(filtered_locations[snpi]).data
 
-            return Response(data=locations)
+            # return Response(data=locations)
         else:
-            return Response(data={"detail": "No Locations"})
-
+            # return Response(data={"detail": "No Locations"})
 
 """
 "Testing errors in the adjacency list:
@@ -250,6 +255,10 @@ These are the errors that may occur when running the Dijkstra code. It provides 
 def checkerrors(request):
     adj_list = handle_entry().load_adj_list()  # change this list accordingly
     # adj_list ={}
+    new_url = "http://127.0.0.1:5000/api/check/"
+    params = request.GET.dict()
+    response = requests.get(new_url, params=params)
+    return Response(response.json())
     items = {}
     items["Failed : Location Does Not Exist"] = []
     items["Failed : MultipleObjectsReturned"] = []
